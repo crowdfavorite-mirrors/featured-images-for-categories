@@ -16,7 +16,9 @@ Check out the video here for a quick summary on how the plugin works.
 
 [vimeo https://vimeo.com/74688948]
 
-(Some Pro features are shown in this video)
+(NB. Two Pro features are also shown in this video: custom taxonomies and support of registered image sizes).
+
+The plugin has a comprehensive documentation page located here: http://helpforwp.com/plugins/featured-images-for-categories/
 
 **Work with custom taxonomies?**
 
