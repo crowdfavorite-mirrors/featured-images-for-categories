@@ -1,10 +1,10 @@
 === Featured Images for Categories ===
 Contributors: PeterShilling 
 Donate link:http://helpforwp.com/donate
-Tags: categories, categories images, featured images
+Tags: categories, categories images, featured images,custom taxonomy
 Requires at least: 3.5
 Tested up to: 3.6
-Stable tag: 
+Stable tag: trunk
 
 Add WordPress Featured Images to both categories & tags so you can easily assign an image to each category and then display via a widget or shortcode on your WordPress site.
 
@@ -14,7 +14,7 @@ Featured Images for Categories will add WordPress Featured Images to both catego
 
 Check out the video here for a quick summary on how the plugin works.
 
-{video to be inserted here}
+https://vimeo.com/74688948
 
 (Some Pro features are shown in this video)
 
@@ -41,10 +41,10 @@ Full documentation and FAQs are available on the HelpForWP.com web site here.
 http://helpforwp.com/plugins/featured-images-for-categories/
 
 == Screenshots ==
-1. screen shot 1 
+1. This screen shot shows the new tool added to the categories and tags interface to assign a featured image
 
-2. screen shot 1 
+2. This screen shot shows the widget the plugin provides to show a gallery of featured images in a widget area
 
 == Changelog ==
 
-Version 1.0 Intial public release
+Version 1.0 Initial public release
