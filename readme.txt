@@ -6,7 +6,7 @@ Requires at least: 3.5
 Tested up to: 3.6
 Stable tag: trunk
 
-Add WordPress Featured Images to both categories & tags so you can easily assign an image to each category and then display via a widget or shortcode on your WordPress site.
+Add WordPress Featured Images to both categories & tags, then display via a widget or shortcode on your WordPress site.
 
 == Description ==
 
@@ -14,11 +14,11 @@ Featured Images for Categories will add WordPress Featured Images to both catego
 
 Check out the video here for a quick summary on how the plugin works.
 
-https://vimeo.com/74688948
+[vimeo https://vimeo.com/74688948]
 
 (Some Pro features are shown in this video)
 
-Work with custom taxonomies?
+**Work with custom taxonomies?**
 
 We also have released a Pro version that supports the following:
 
