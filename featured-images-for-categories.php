@@ -4,7 +4,7 @@
 Plugin Name: Featured Images for Categories
 Plugin URI: http://helpforwp.com/plugins/featured-images-for-categories/
 Description: Assign a featured image to a WordPress category or tag, then use these featured images via a widget area or a shortcode. Custom taxonomies? Check our site for the Pro version.
-Version: 1.0
+Version: 1.1
 Author: HelpForWP
 Author URI: http://HelpForWP.com
 
@@ -57,8 +57,6 @@ class WPFeaturedImgCategories {
 		
 		//shortcodes
 		add_shortcode('FeaturedImagesCat', array($this, 'wpfifc_front_show') );
-		
-		add_action( 'genesis_before_loop', array($this, 'genesis_show_taxonomy_image'), 12 );
 	}
 
 	
@@ -266,9 +264,24 @@ class WPFeaturedImgCategories {
 							  'imagesize' => '',
 							  'orderby' => 'name',
 							  'order' => 'ASC',
-							  'hideempty' => 0), 
+							  'hideempty' => 0,
+							  'showcatname' => 0,
+							  'showcatdesc' => 0), 
 						$atts )
 			   );
+		$show_cat_name = false;
+		$show_cat_desc = false;
+		if( $showcatname && is_string($showcatname) ){
+			$show_cat_name = $showcatname == 'true' ? true : false;
+		}else if( is_bool($showcatname) ){
+			$show_cat_name = $showcatname;
+		}
+		$show_cat_desc = false;
+		if( $showcatdesc && is_string($showcatdesc) ){
+			$show_cat_desc = $showcatdesc == 'true' ? true : false;
+		}else if( is_bool($showcatdesc) ){
+			$show_cat_desc = $showcatdesc;
+		}
 		$taxonomy = strtolower($taxonomy);
 		if ( $taxonomy == '' || ($taxonomy != 'category' && $taxonomy != 'post_tag') ){
 			return '';
@@ -326,8 +339,18 @@ class WPFeaturedImgCategories {
 				$images_str .= '<div style="width:'.$column_width.'%; text-align:center;float:left;">
 									<a href="'.get_term_link($term->slug, $taxonomy).'" title="'.$term->name.'">
 										<img src="'.$src.'" alt="'.$term->name.'" style="padding:'.$padding_str.'" />
-									</a>
-								</div>'."\n";
+									</a>';
+				if( $show_cat_name ){
+					$images_str .= '
+									<a href="'.get_term_link($term->slug, $taxonomy).'" title="'.$term->name.'">
+										<h2 class="FeaturedImageCat">'.$term->name.'</h2>
+									</a>';
+				}
+				if( $show_cat_desc ){					
+					$images_str .= '<div class="FeaturedImageCatDesc">'.$term->description.'</div>';
+				}
+				
+				$images_str .= '	</div>'."\n";
 				$column_item++;
 				if ( $column_item >= $columns ){
 					$column_item = 0;
@@ -339,63 +362,6 @@ class WPFeaturedImgCategories {
 		$output .= '</div>'."\n";
 		
 		return $output;
-	}
-	
-	
-	function genesis_show_taxonomy_image(){
-		if(!defined('PARENT_THEME_NAME') || PARENT_THEME_NAME != 'Genesis'){
-			return;
-		}
-		global $wp_query;
-
-		if (!is_category() && !is_tag()){
-			return;
-		}
-	
-		if (get_query_var( 'paged' ) >= 2){
-			return;
-		}
-		$taxonomy = '';
-		if(is_category()){
-			$taxonomy = 'category';
-		}
-		if(is_tag()){
-			$taxonomy = 'post_tag';
-		}
-		if(is_tax()){
-			return;
-		}
-		$saved_genesis_taxonomies = get_option('wpfifc_genesis_taxonomy', array());
-		$saved_genesis_postion = get_option('wpfifc_genesis_position', 'left');
-		$imagesize = get_option('wpfifc_default_size', 'thumbnail');
-		if ( $imagesize == '' ){
-			$imagesize = 'thumbnail';
-		}
-		if (!is_array($saved_genesis_taxonomies) || count($saved_genesis_taxonomies) < 1){
-			return;
-		}
-		if(!in_array($taxonomy, $saved_genesis_taxonomies)){
-			return;
-		}
-
-		$term = $wp_query->get_queried_object();
-		if (!$term){
-			return;
-		}
-		$term_id = $term->term_id;
-		$post_ID = get_option('_wpfifc_taxonomy_term_'.$term_id, 0);
-		if ( $post_ID < 1 ){
-			return;
-		}
-		$thumbnail_id = get_post_meta( $post_ID, '_thumbnail_id', true );
-		$image = wp_get_attachment_image_src( $thumbnail_id, $imagesize );
-		
-		list($src, $width, $height) = $image;
-		if ( $src ){
-			echo '<img src="'.$src.'" style="float:'.$saved_genesis_postion.';" class="FeaturedImageTax"/>';
-		}
-		
-		return;
 	}
 }
 

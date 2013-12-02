@@ -49,4 +49,6 @@ http://helpforwp.com/plugins/featured-images-for-categories/
 
 == Changelog ==
 
+Version 1.1 Add two new options in shortcode, category name and category description can be displayed under the featured image
+
 Version 1.0 Initial public release
