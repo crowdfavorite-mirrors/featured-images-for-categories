@@ -70,7 +70,13 @@ function wpfifc_options_shown() {
 	    	[FeaturedImagesCat taxonomy='category' columns='3']
 	    	
     	</p>
-    	
+    	<p>To display the name of the category or the category description use these arguments in the shortcode showCatName='true' showCatDesc='true'.
+				<p>
+			    	[FeaturedImagesCat taxonomy='category' columns='3' showCatName='true' showCatDesc='true']
+
+		    	</p>
+
+		</p>
     	<p>To use with tags instead change the 'category' value to 'post_tags' like this</p>
     	<p>[FeaturedImagesCat taxonomy='post_tag' columns='3'] </p>
     	<p>The columns value can be adjusted to determine the number of columns the shortcode will produce.
