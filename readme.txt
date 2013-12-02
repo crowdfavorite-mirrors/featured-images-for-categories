@@ -27,6 +27,8 @@ We also have released a Pro version that supports the following:
 * Custom taxonomies
 * Additional widget to featured individual terms in a widget area
 * Support for all registered image sizes in your WordPress theme
+* A PHP function call for developers to access the featured images assigned to a category
+* Ability in the shortcodes to specify exactly which categories to display by category ID
 
 More info on the Pro version available here
 
