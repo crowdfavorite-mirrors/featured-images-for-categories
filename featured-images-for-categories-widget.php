@@ -72,11 +72,10 @@
 			$column_item = 0;
 			foreach( $taxonomy_terms as $term ){
 				$term_id = $term->term_id;
-				$post_ID = get_option('_wpfifc_taxonomy_term_'.$term_id, 0);
-				if ( $post_ID < 1 ){
+				$thumbnail_id = get_option( '_wpfifc_taxonomy_term_'.$term_id.'_thumbnail_id_', 0 );
+				if ( $thumbnail_id < 1 ){
 					continue;
 				}
-	
 				$thumbnail_id = get_post_meta( $post_ID, '_thumbnail_id', true );
 				$image = wp_get_attachment_image_src( $thumbnail_id, $imagesize );
 	

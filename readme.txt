@@ -3,7 +3,7 @@ Contributors: PeterShilling
 Donate link:http://helpforwp.com/donate
 Tags: categories, categories images, featured images,custom taxonomy
 Requires at least: 3.5
-Tested up to: 3.6
+Tested up to: 3.8
 Stable tag: trunk
 
 Add WordPress Featured Images to both categories & tags, then display via a widget or shortcode on your WordPress site.
@@ -50,6 +50,8 @@ http://helpforwp.com/plugins/featured-images-for-categories/
 2. This screen shot shows the widget the plugin provides to show a gallery of featured images in a widget area
 
 == Changelog ==
+
+Version 1.2 Fixed a bug which may cause featured images to be removed
 
 Version 1.1 Add two new options in shortcode, category name and category description can be displayed under the featured image
 

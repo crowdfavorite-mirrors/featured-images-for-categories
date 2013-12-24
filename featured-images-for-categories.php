@@ -4,7 +4,7 @@
 Plugin Name: Featured Images for Categories
 Plugin URI: http://helpforwp.com/plugins/featured-images-for-categories/
 Description: Assign a featured image to a WordPress category or tag, then use these featured images via a widget area or a shortcode. Custom taxonomies? Check our site for the Pro version.
-Version: 1.1
+Version: 1.2
 Author: HelpForWP
 Author URI: http://HelpForWP.com
 
@@ -28,6 +28,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 require_once('featured-images-for-categories-widget.php');
 
 class WPFeaturedImgCategories {
+	
+	var $_database_version = 132;
+	var $_database_option_name = '_wpfifc_taxonomy_term_database_version_';
 
 	public function __construct() {
 		
@@ -57,6 +60,9 @@ class WPFeaturedImgCategories {
 		
 		//shortcodes
 		add_shortcode('FeaturedImagesCat', array($this, 'wpfifc_front_show') );
+		
+		//check and update database format
+		$this->wpfifc_upgrade_database();
 	}
 
 	
@@ -141,62 +147,18 @@ class WPFeaturedImgCategories {
 	}
 	
 	function wpfifc_taxonomies_add_form_fields(){
-		add_action( 'category_add_form_fields', array($this, 'wpfifc_taxonomies_new_meta'), 10, 2 );
 		add_action( 'category_edit_form_fields', array($this, 'wpfifc_taxonomies_edit_meta'), 10, 2 );
-		add_action( 'post_tag_add_form_fields', array($this, 'wpfifc_taxonomies_new_meta'), 10, 2 );
 		add_action( 'post_tag_edit_form_fields', array($this, 'wpfifc_taxonomies_edit_meta'), 10, 2 );
 	}
-	
-	// Add term page
-	function wpfifc_taxonomies_new_meta( $term ) {
-		// this will add the custom meta field to the add new term page
-		$post = get_default_post_to_edit( 'post', true );
-		$post_ID = $post->ID;
-
-		?>
-        <style type="text/css" media="all">.inside a{ font-style:normal; }</style>
-		<div class="form-field">
-            <div id="postimagediv" class="postbox" style="width:95%;" >
-				<div class="handlediv" title="Click to toggle"><br /></div>
-				<h3 class='hndle' style="margin:0; padding:7px 10px 7px 10px; font-size:15px; font-weight:400;"><span>Featured Image</span></h3>
-				<div class="inside">
-                	<?php wp_enqueue_media( array('post' => $post_ID) ); ?>
-					<?php
-						$thumbnail_id = get_post_meta( $post_ID, '_thumbnail_id', true );
-						echo _wp_post_thumbnail_html( $thumbnail_id, $post_ID );
-                    ?>
-                </div>
-                <input type="hidden" name="wpfifc_taxonomies_post_ID" id="wpfifc_taxonomies_post_ID_id" value="<?php echo $post_ID; ?>" />
-                <div style="clear:both;"></div>
-			</div>
-        </div>
-	<?php
-	}
-	
-	
 	
 	//edit term page
 	function wpfifc_taxonomies_edit_meta( $term ) {
 		global $wpdb;
 		
  		// put the term ID into a variable
-		$t_id = $term->term_id;
-		$post_ID = get_option( "_wpfifc_taxonomy_term_$t_id", 0 ); 
-		if ( $post_ID == 0 ){
-			$post = get_default_post_to_edit( 'post', true );
-			$post_ID = $post->ID;
-		}else{
-			$thumbnail_id = get_post_meta( $post_ID, '_thumbnail_id', true );
-			$image = wp_get_attachment_image_src( $thumbnail_id, $imagesize );
-			list($src, $width, $height) = $image;
-			if ( !$src ){
-				$sql = 'DELETE FROM '.$wpdb->options.' WHERE option_name LIKE "_wpfifc_taxonomy_term_%" AND option_value = '.$post_ID;
-				$wpdb->query( $sql );
-				
-				$post = get_default_post_to_edit( 'post', true );
-				$post_ID = $post->ID;
-			}
-		}
+		$term_id = $term->term_id;
+		$post = get_default_post_to_edit( 'post', true );
+		$post_ID = $post->ID;
 	?>
         <tr class="form-field">
 			<th>Set Featured Image</th>
@@ -205,11 +167,12 @@ class WPFeaturedImgCategories {
                     <div class="inside">
                         <?php wp_enqueue_media( array('post' => $post_ID) ); ?>
                         <?php
-                            $thumbnail_id = get_post_meta( $post_ID, '_thumbnail_id', true );
+							$thumbnail_id = get_option( '_wpfifc_taxonomy_term_'.$term_id.'_thumbnail_id_', 0 );
                             echo _wp_post_thumbnail_html( $thumbnail_id, $post_ID );
                         ?>
                     </div>
-                    <input type="hidden" name="wpfifc_taxonomies_post_ID" id="wpfifc_taxonomies_edit_post_ID_id" value="<?php echo $post_ID; ?>" />
+                    <input type="hidden" name="wpfifc_taxonomies_edit_post_ID" id="wpfifc_taxonomies_edit_post_ID_id" value="<?php echo $post_ID; ?>" />
+                    <input type="hidden" name="wpfifc_taxonomies_edit_term_ID" id="wpfifc_taxonomies_edit_term_ID_id" value="<?php echo $term_id; ?>" />
                 </div>
         	</td>
 		</tr>
@@ -218,23 +181,21 @@ class WPFeaturedImgCategories {
 	
 	function wpfifc_taxonomies_save_form_fields(){
 		add_action('edited_category', array($this, 'wpfifc_taxonomies_save_meta'), 10, 2 );  
-		add_action('create_category', array($this, 'wpfifc_taxonomies_save_meta'), 10, 2 );
 		add_action('edited_post_tag', array($this, 'wpfifc_taxonomies_save_meta'), 10, 2 );  
-		add_action('create_post_tag', array($this, 'wpfifc_taxonomies_save_meta'), 10, 2 );
 	}
 
 	function wpfifc_taxonomies_save_meta( $term_id ) {
-		if ( isset( $_POST['wpfifc_taxonomies_post_ID'] ) ) {
-			update_option( "_wpfifc_taxonomy_term_$term_id", trim($_POST['wpfifc_taxonomies_post_ID']) );
+		if ( isset( $_POST['wpfifc_taxonomies_create_post_ID'] ) ) {
+			$default_post_ID = $_POST['wpfifc_taxonomies_create_post_ID'];
+		}else if ( isset( $_POST['wpfifc_taxonomies_edit_post_ID'] ) ) {
+			$default_post_ID = $_POST['wpfifc_taxonomies_edit_post_ID'];
+		}
+		$thumbnail_id = get_post_meta( $default_post_ID, '_thumbnail_id', true );
+		if( $thumbnail_id ){
+			update_option( '_wpfifc_taxonomy_term_'.$term_id.'_thumbnail_id_', $thumbnail_id );
 		}
 	}  
-	
-	function wpfifc_remove_option_when_post_deleted( $post_id ){
-		global $wpdb;
-		
-		$sql = 'DELETE FROM '.$wpdb->options.' WHERE option_name LIKE "_wpfifc_taxonomy_term_%" AND option_value = '.$post_id;
-		$wpdb->query( $sql );
-	}
+
 	function wpfifc_ajax_set_post_thumbnail() {
 		global $current_user;
 
@@ -245,14 +206,17 @@ class WPFeaturedImgCategories {
 		if ( $post_ID < 1 ){
 			wp_die( "ERROR:Invalid post ID.".$post_ID );
 		}
+		delete_post_thumbnail( $post_ID );
+
 		$thumbnail_id = intval( $_POST['thumbnail_id'] );
 		if ( $thumbnail_id == '-1' ){
-			if ( delete_post_thumbnail( $post_ID ) ) {
-				$return = _wp_post_thumbnail_html( null, $post_ID );
-				wp_die( $return );
-			}else{
-				wp_die( "ERROR:Remove featured image failed." );
+			//delete option which used to saving thumbnail id
+			if( $_POST['term_id'] > 0 ){
+				delete_option( '_wpfifc_taxonomy_term_'.$_POST['term_id'].'_thumbnail_id_' );
 			}
+			$return = _wp_post_thumbnail_html( null, $post_ID );
+			wp_die( $return );
+			
 		}
 		wp_die( "ERROR" );
 	}
@@ -325,12 +289,10 @@ class WPFeaturedImgCategories {
 		$column_item = 0;
 		foreach( $taxonomy_terms as $term ){
 			$term_id = $term->term_id;
-			$post_ID = get_option('_wpfifc_taxonomy_term_'.$term_id, 0);
-			if ( $post_ID < 1 ){
+			$thumbnail_id = get_option( '_wpfifc_taxonomy_term_'.$term_id.'_thumbnail_id_', 0 );
+			if ( $thumbnail_id < 1 ){
 				continue;
 			}
-
-			$thumbnail_id = get_post_meta( $post_ID, '_thumbnail_id', true );
 			$image = wp_get_attachment_image_src( $thumbnail_id, $imagesize );
 
 			list($src, $width, $height) = $image;
@@ -362,6 +324,57 @@ class WPFeaturedImgCategories {
 		$output .= '</div>'."\n";
 		
 		return $output;
+	}
+	
+	function wpfifc_upgrade_database(){
+		global $wpdb;
+		
+		$exist_database_version = get_site_option( $this->_database_option_name, 0 );
+		if( $exist_database_version >= $this->_database_version ){
+			return;
+		}
+		
+		//convert old data format to new and save database version
+		$sql = 'SELECT `option_id`, `option_name`, `option_value` FROM `'.$wpdb->options.'` WHERE `option_name` LIKE "_wpfifc_taxonomy_term_%"';
+		$results = $wpdb->get_results( $sql );
+		if( !$results || count($results) < 1 ){
+			update_option( $this->_database_option_name, $this->_database_version );
+			return;
+		}
+		$old_option_ids = array();
+		foreach( $results as $record ){
+			$old_option_ids[] = $record->option_id;
+			$term_id = str_replace('_wpfifc_taxonomy_term_', '', $record->option_name);
+			$term_id = intval($term_id);
+			$post_ID = $record->option_value;
+			//check if the post still in database
+			$sql_post = 'SELECT * FROM `'.$wpdb->posts.'` WHERE `ID` = '.$post_ID;
+			if( !$wpdb->get_results( $sql_post ) ){
+				continue;
+			}
+			//get thumbnail id
+			$sql_postmeta = 'SELECT * FROM `'.$wpdb->postmeta.'` WHERE `post_id` = '.$post_ID.' AND `meta_key` = "_thumbnail_id"';
+			$thumbnail_id_obj = $wpdb->get_results( $sql_postmeta );
+			if( !$thumbnail_id_obj ){
+				continue;
+			}
+			$thumbnail_id = $thumbnail_id_obj[0]->meta_value;
+			$thumbnail_id = intval($thumbnail_id);
+			if( !$thumbnail_id ){
+				continue;
+			}
+			//write new option
+			$new_option = '_wpfifc_taxonomy_term_'.$term_id.'_thumbnail_id_';
+			update_option( $new_option, $thumbnail_id );
+		}
+		
+		//remove old options
+		$optons_ids_str = implode( ',', $old_option_ids );
+		$optons_ids_str = trim( $optons_ids_str );
+		$sql = 'DELETE FROM '.$wpdb->options.' WHERE option_id IN ('.$optons_ids_str.')';
+		$wpdb->query( $sql );
+		
+		update_option( $this->_database_option_name, $this->_database_version );
 	}
 }
 
