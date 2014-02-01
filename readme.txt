@@ -50,6 +50,7 @@ http://helpforwp.com/plugins/featured-images-for-categories/
 2. This screen shot shows the widget the plugin provides to show a gallery of featured images in a widget area
 
 == Changelog ==
+Version 1.2.2 Minor bug fixes
 
 Version 1.2 Fixed a bug which may cause featured images to be removed
 

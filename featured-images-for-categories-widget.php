@@ -76,7 +76,6 @@
 				if ( $thumbnail_id < 1 ){
 					continue;
 				}
-				$thumbnail_id = get_post_meta( $post_ID, '_thumbnail_id', true );
 				$image = wp_get_attachment_image_src( $thumbnail_id, $imagesize );
 	
 				list($src, $width, $height) = $image;
@@ -99,7 +98,7 @@
 			
 			echo $output;
 			
-			
+
 			echo $args['after_widget'];
 		}
 	

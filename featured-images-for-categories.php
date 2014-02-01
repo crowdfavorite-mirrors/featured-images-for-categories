@@ -4,7 +4,7 @@
 Plugin Name: Featured Images for Categories
 Plugin URI: http://helpforwp.com/plugins/featured-images-for-categories/
 Description: Assign a featured image to a WordPress category or tag, then use these featured images via a widget area or a shortcode. Custom taxonomies? Check our site for the Pro version.
-Version: 1.2.1
+Version: 1.2.2
 Author: HelpForWP
 Author URI: http://HelpForWP.com
 
@@ -329,7 +329,7 @@ class WPFeaturedImgCategories {
 	function wpfifc_upgrade_database(){
 		global $wpdb;
 		
-		$exist_database_version = get_site_option( $this->_database_option_name, 0 );
+		$exist_database_version = get_option( $this->_database_option_name, 0 );
 		if( $exist_database_version >= $this->_database_version ){
 			return;
 		}
