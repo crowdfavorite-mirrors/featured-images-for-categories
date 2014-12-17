@@ -3,7 +3,7 @@ Contributors: PeterShilling
 Donate link:http://helpforwp.com/donate
 Tags: categories, categories images, featured images,custom taxonomy
 Requires at least: 3.5
-Tested up to: 3.8
+Tested up to: 3.9.2
 Stable tag: trunk
 
 Add WordPress Featured Images to both categories & tags, then display via a widget or shortcode on your WordPress site.
@@ -43,6 +43,54 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 Full documentation and FAQs are available on the HelpForWP.com web site here.
 
 http://helpforwp.com/plugins/featured-images-for-categories/
+
+Shortcode reference for the Plugin.
+
+There is a number of shortcode arguments that you can use to control the output of this plugin.
+
+Some are available in both the free version available here on WordPress.org and some are only available in the Pro version - more information on this is available here - http://helpforwp.com/plugins/featured-images-for-categories/
+
+** Example shortcodes for the free version **
+
+[FeaturedImagesCat taxonomy='category' columns='3'] 
+
+Choose to display categories in 3 columns
+
+
+[FeaturedImagesCat taxonomy='post_tag' columns='3']
+
+Choose to display tags in 3 columns
+
+** Example shortcodes for the Pro version **
+
+
+[FeaturedImagesCat taxonomy='mytaxonomy' columns='2'] 
+
+Display a custom taxonomy
+
+[FeaturedImagesCat taxonomy='mytaxonomy' columns='3' imagesize='myImageSize'] 
+
+Imagesize can be set to any registered image size in your theme eg thumbnail, medium or a custom size
+
+[FeaturedImagesCat taxonomy='mytaxonomy' columns='2' showCatName='true'] 
+
+Choose to display the name of the category
+
+[FeaturedImagesCat taxonomy='mytaxonomy' columns='2' showCatName='true' showCatDesc='true']
+
+Choose to display the description of the category
+
+[FeaturedImagesCat taxonomy='mytaxonomy' columns='2' include='2,4,6,23'] 
+
+Choose specific category ids
+
+[FeaturedImagesCat taxonomy='mytaxonomy' columns='2' parentcatsonly="true"]
+
+Show only top level categories
+
+[FeaturedImagesCat taxonomy='category' columns='2' childrenonly="1,4,65" ]
+
+Show specific child categories
 
 == Screenshots ==
 1. This screen shot shows the new tool added to the categories and tags interface to assign a featured image
